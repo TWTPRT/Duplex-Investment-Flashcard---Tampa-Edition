@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tampa Duplex Investment Flashcards</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --orange: #ea580c;
+    --orange-light: #fff7ed;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.10);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-800);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ========== USER SELECT SCREEN ========== */
+  .screen { display:none; flex-direction:column; min-height:100vh; min-height:100dvh; }
+  .screen.active { display:flex; }
+
+  .user-screen {
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    color: white;
+  }
+  .user-screen h1 { font-size: 1.6rem; margin-bottom: 6px; text-align:center; }
+  .user-screen .subtitle { opacity:0.8; margin-bottom: 32px; font-size:0.95rem; text-align:center; }
+  .user-cards { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-bottom:24px; }
+  .user-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    min-width: 140px;
+  }
+  .user-card:hover, .user-card:active {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.5);
+    transform: translateY(-2px);
+  }
+  .user-card .avatar { font-size: 2.8rem; margin-bottom: 8px; }
+  .user-card .uname { font-size: 1.1rem; font-weight: 600; }
+  .add-user-btn {
+    background: transparent;
+    border: 2px dashed rgba(255,255,255,0.4);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    font-size: 1rem;
+    transition: all 0.2s;
+    min-width: 140px;
+  }
+  .add-user-btn:hover { border-color: rgba(255,255,255,0.7); color:white; }
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none;
+    justify-content:center; align-items:center; z-index:100; padding:24px;
+  }
+  .modal-overlay.show { display:flex; }
+  .modal {
+    background:white; border-radius:var(--radius); padding:28px; max-width:340px; width:100%;
+    color: var(--gray-800);
+  }
+  .modal h3 { margin-bottom:16px; font-size:1.15rem; }
+  .modal input {
+    width:100%; padding:12px 14px; border:2px solid var(--gray-200); border-radius:10px;
+    font-size:1rem; margin-bottom:12px; outline:none;
+  }
+  .modal input:focus { border-color: var(--primary); }
+  .emoji-pick { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .emoji-pick button {
+    font-size:1.6rem; background:var(--gray-100); border:2px solid transparent;
+    border-radius:10px; padding:6px 10px; cursor:pointer; transition:0.15s;
+  }
+  .emoji-pick button.selected { border-color:var(--primary); background:#dbeafe; }
+  .modal-actions { display:flex; gap:10px; }
+  .modal-actions button {
+    flex:1; padding:11px; border:none; border-radius:10px; font-size:0.95rem;
+    font-weight:600; cursor:pointer;
+  }
+  .btn-cancel { background:var(--gray-200); color:var(--gray-600); }
+  .btn-confirm { background:var(--primary); color:white; }
+
+  /* ========== DASHBOARD ========== */
+  .dashboard { background: var(--gray-50); }
+  .dash-header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    color:white; padding: 20px 20px 24px;
+  }
+  .dash-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .dash-user { display:flex; align-items:center; gap:10px; }
+  .dash-user .avatar { font-size:1.6rem; }
+  .dash-user .greeting { font-size:1.05rem; font-weight:600; }
+  .btn-switch {
+    background:rgba(255,255,255,0.2); border:none; color:white; padding:8px 14px;
+    border-radius:10px; font-size:0.85rem; cursor:pointer; font-weight:500;
+  }
+  .progress-box {
+    background:rgba(255,255,255,0.15); border-radius:12px; padding:16px;
+  }
+  .progress-box .label { font-size:0.85rem; opacity:0.85; margin-bottom:8px; }
+  .progress-bar-bg {
+    background:rgba(255,255,255,0.2); border-radius:20px; height:10px; overflow:hidden;
+  }
+  .progress-bar-fill {
+    height:100%; background:white; border-radius:20px; transition: width 0.5s ease;
+  }
+  .progress-stats { display:flex; justify-content:space-between; margin-top:8px; font-size:0.8rem; opacity:0.8; }
+
+  .dash-body { padding: 16px 16px 100px; }
+  .mode-title { font-size:1rem; font-weight:700; color:var(--gray-700); margin:16px 0 12px; }
+  .mode-cards { display:flex; flex-direction:column; gap:10px; }
+  .mode-card {
+    background:white; border-radius:14px; padding:16px 18px; cursor:pointer;
+    border:2px solid var(--gray-200); transition:0.2s; display:flex; align-items:center; gap:14px;
+  }
+  .mode-card:hover,.mode-card:active { border-color:var(--primary); transform:translateY(-1px); box-shadow:var(--shadow); }
+  .mode-icon { font-size:1.8rem; flex-shrink:0; }
+  .mode-info h3 { font-size:0.95rem; color:var(--gray-800); margin-bottom:2px; }
+  .mode-info p { font-size:0.82rem; color:var(--gray-500); }
+  .lesson-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:12px; }
+  .lesson-btn {
+    background:white; border:2px solid var(--gray-200); border-radius:12px;
+    padding:12px 14px; cursor:pointer; text-align:left; transition:0.2s; position:relative;
+  }
+  .lesson-btn:hover,.lesson-btn:active { border-color:var(--primary); }
+  .lesson-btn .lnum { font-size:0.75rem; color:var(--primary); font-weight:700; }
+  .lesson-btn .ltitle { font-size:0.82rem; color:var(--gray-700); font-weight:500; margin-top:2px; }
+  .lesson-btn .ldot {
+    position:absolute; top:8px; right:8px; width:8px; height:8px; border-radius:50%;
+  }
+  .ldot.mastered { background:var(--green); }
+  .ldot.learning { background:var(--orange); }
+  .ldot.new { background:var(--gray-300); }
+
+  /* ========== FLASHCARD GAME ========== */
+  .game-screen { background:var(--gray-100); }
+  .game-header {
+    display:flex; align-items:center; padding:14px 16px; background:white;
+    border-bottom:1px solid var(--gray-200); gap:12px;
+  }
+  .btn-back {
+    background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--gray-500);
+    padding:4px;
+  }
+  .game-title { flex:1; font-size:0.95rem; font-weight:600; color:var(--gray-700); }
+  .game-count { font-size:0.82rem; color:var(--gray-400); font-weight:500; }
+
+  .card-area {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:20px; gap:20px;
+  }
+  .flashcard-container { perspective:1000px; width:100%; max-width:420px; }
+  .flashcard {
+    position:relative; width:100%; min-height: 320px; cursor:pointer;
+    transform-style: preserve-3d; transition: transform 0.5s ease;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position:absolute; inset:0; backface-visibility:hidden;
+    border-radius:var(--radius); padding:28px 24px; display:flex;
+    flex-direction:column; justify-content:center; box-shadow: var(--shadow-lg);
+  }
+  .card-front {
+    background:white;
+  }
+  .card-back {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    transform: rotateY(180deg);
+  }
+  .card-type-badge {
+    font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+    padding:4px 10px; border-radius:20px; display:inline-block; margin-bottom:14px; width:fit-content;
+  }
+  .badge-concept { background:#dbeafe; color:#1d4ed8; }
+  .badge-formula { background:#dcfce7; color:#15803d; }
+  .badge-challenge { background:#fff7ed; color:#c2410c; }
+  .card-question { font-size:1.2rem; font-weight:700; color:var(--gray-800); line-height:1.4; }
+  .card-lesson-ref { font-size:0.78rem; color:var(--gray-400); margin-top:12px; }
+  .card-hint { font-size:0.82rem; color:var(--gray-500); margin-top:8px; font-style:italic; }
+  .card-answer { font-size:1rem; color:var(--gray-700); line-height:1.6; }
+  .card-answer strong { color:var(--gray-900); }
+  .card-answer .formula-box {
+    background:var(--gray-800); color:#a5f3fc; padding:12px 16px; border-radius:10px;
+    font-family: 'Courier New', monospace; font-size:0.9rem; margin:10px 0;
+    line-height:1.5;
+  }
+  .card-answer .example-box {
+    background:white; border:2px solid var(--gray-200); border-radius:10px;
+    padding:12px 16px; font-size:0.88rem; margin:10px 0; line-height:1.5;
+  }
+  .card-answer .tampa-tip {
+    background:#fef3c7; border-radius:10px; padding:10px 14px; font-size:0.85rem;
+    margin-top:10px;
+  }
+  .tap-hint {
+    font-size:0.8rem; color:var(--gray-400); text-align:center;
+  }
+
+  .card-actions {
+    display:flex; gap:12px; width:100%; max-width:420px;
+  }
+  .card-actions button {
+    flex:1; padding:14px; border:none; border-radius:12px; font-size:0.95rem;
+    font-weight:600; cursor:pointer; transition:0.15s;
+  }
+  .btn-again { background:var(--red-light); color:var(--red); }
+  .btn-hard { background:var(--orange-light); color:var(--orange); }
+  .btn-good { background:var(--green-light); color:var(--green); }
+
+  /* ========== RESULTS SCREEN ========== */
+  .results-screen { justify-content:center; align-items:center; padding:24px; background:var(--gray-50); }
+  .results-box {
+    background:white; border-radius:var(--radius); padding:32px; max-width:400px;
+    width:100%; text-align:center; box-shadow:var(--shadow);
+  }
+  .results-emoji { font-size:3rem; margin-bottom:12px; }
+  .results-box h2 { font-size:1.3rem; margin-bottom:16px; color:var(--gray-800); }
+  .results-stats { display:flex; justify-content:center; gap:20px; margin-bottom:24px; }
+  .stat-item { text-align:center; }
+  .stat-num { font-size:1.5rem; font-weight:700; }
+  .stat-num.green { color:var(--green); }
+  .stat-num.orange { color:var(--orange); }
+  .stat-num.red { color:var(--red); }
+  .stat-label { font-size:0.75rem; color:var(--gray-500); margin-top:2px; }
+  .results-actions { display:flex; flex-direction:column; gap:10px; }
+  .results-actions button {
+    padding:14px; border:none; border-radius:12px; font-size:0.95rem;
+    font-weight:600; cursor:pointer; width:100%;
+  }
+  .btn-primary { background:var(--primary); color:white; }
+  .btn-secondary { background:var(--gray-100); color:var(--gray-700); }
+
+  /* ========== DELETE CONFIRM ========== */
+  .delete-zone { margin-top: 12px; text-align:center; }
+  .btn-delete-user {
+    background: transparent; border: none; color: var(--red);
+    font-size: 0.82rem; cursor: pointer; padding: 6px 12px; text-decoration: underline;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (min-width:600px) {
+    .lesson-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .flashcard { min-height: 360px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== USER SELECT SCREEN ===== -->
+<div id="userScreen" class="screen user-screen active">
+  <h1>Tampa Duplex Flashcards</h1>
+  <p class="subtitle">Who's studying today?</p>
+  <div class="user-cards" id="userCards"></div>
+  <button class="add-user-btn" onclick="openAddUser()">+ Add Player</button>
+</div>
+
+<!-- ===== ADD USER MODAL ===== -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <h3>New Player</h3>
+    <input type="text" id="newUserName" placeholder="Your name" maxlength="20" autocomplete="off">
+    <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:8px;">Pick your avatar:</p>
+    <div class="emoji-pick" id="emojiPick"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAddUser()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmAddUser()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DELETE CONFIRM MODAL ===== -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Delete this player?</h3>
+    <p style="font-size:0.9rem;color:var(--gray-500);margin-bottom:16px;">All progress will be lost. This can't be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDeleteModal()">Keep</button>
+      <button class="btn-confirm" style="background:var(--red);" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard" class="screen dashboard">
+  <div class="dash-header">
+    <div class="dash-top">
+      <div class="dash-user">
+        <span class="avatar" id="dashAvatar"></span>
+        <span class="greeting" id="dashGreeting"></span>
+      </div>
+      <button class="btn-switch" onclick="switchUser()">Switch Player</button>
+    </div>
+    <div class="progress-box">
+      <div class="label">Overall Mastery</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <div class="progress-stats">
+        <span id="masteredCount">0 mastered</span>
+        <span id="totalCards">0 cards</span>
+      </div>
+    </div>
+  </div>
+  <div class="dash-body">
+    <div class="mode-title">Study Modes</div>
+    <div class="mode-cards">
+      <div class="mode-card" onclick="startGame('all')">
+        <span class="mode-icon">🔀</span>
+        <div class="mode-info">
+          <h3>All Cards (Shuffle)</h3>
+          <p>All 16 lessons, random order</p>
+        </div>
+      </div>
+      <div class="mode-card" onclick="startGame('weak')">
+        <span class="mode-icon">🔥</span>
+        <div class="mode-info">
+          <h3>Weak Cards Only</h3>
+          <p>Focus on cards you marked "Again" or "Hard"</p>
+        </div>
+      </div>
+      <div class="mode-card" onclick="startGame('formulas')">
+        <span class="mode-icon">🧮</span>
+        <div class="mode-info">
+          <h3>Formulas & Calculations</h3>
+          <p>Just the math — formulas and challenge cards</p>
+        </div>
+      </div>
+    </div>
+    <div class="mode-title" style="margin-top:24px;">Study by Lesson</div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+    <div class="delete-zone">
+      <button class="btn-delete-user" onclick="openDeleteModal()">Delete this player</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="gameScreen" class="screen game-screen">
+  <div class="game-header">
+    <button class="btn-back" onclick="exitGame()">←</button>
+    <span class="game-title" id="gameTitle">All Cards</span>
+    <span class="game-count" id="gameCount">1 / 20</span>
+  </div>
+  <div class="card-area">
+    <div class="flashcard-container">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="card-face card-front" id="cardFront"></div>
+        <div class="card-face card-back" id="cardBack"></div>
+      </div>
+    </div>
+    <p class="tap-hint" id="tapHint">Tap the card to reveal the answer</p>
+    <div class="card-actions" id="cardActions" style="display:none;">
+      <button class="btn-again" onclick="rateCard('again')">Again</button>
+      <button class="btn-hard" onclick="rateCard('hard')">Hard</button>
+      <button class="btn-good" onclick="rateCard('good')">Got it!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESULTS ===== -->
+<div id="resultsScreen" class="screen results-screen">
+  <div class="results-box">
+    <div class="results-emoji" id="resultsEmoji">🎉</div>
+    <h2 id="resultsTitle">Session Complete!</h2>
+    <div class="results-stats">
+      <div class="stat-item"><div class="stat-num green" id="resGood">0</div><div class="stat-label">Got it</div></div>
+      <div class="stat-item"><div class="stat-num orange" id="resHard">0</div><div class="stat-label">Hard</div></div>
+      <div class="stat-item"><div class="stat-num red" id="resAgain">0</div><div class="stat-label">Again</div></div>
+    </div>
+    <div class="results-actions">
+      <button class="btn-primary" onclick="startGame('weak')">Review Weak Cards</button>
+      <button class="btn-secondary" onclick="showScreen('dashboard')">Back to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// FLASHCARD DATA — ALL 16 LESSONS
+// ==========================================
+const ALL_CARDS = [
+  // ===== LESSON 1: Rehab Cost Per Square Foot =====
+  {
+    lesson: 1, lessonTitle: "Rehab Cost Per Square Foot", type: "concept",
+    front: "What does \"rehab\" mean in real estate?",
+    back: `<strong>Rehab = fixing up a house</strong> — new paint, new floors, fixing the kitchen, etc. Instead of guessing the total cost, investors estimate using <strong>cost per square foot</strong>. It's like buying carpet: if carpet costs $5/sqft and your room is 100 sqft, you pay $500. Same idea, but for the whole house.`
+  },
+  {
+    lesson: 1, lessonTitle: "Rehab Cost Per Square Foot", type: "formula",
+    front: "How do you estimate rehab cost?",
+    back: `<strong>Multiply the square footage by the cost per sqft.</strong>
+<div class="formula-box">Square Feet × $25/sqft = Rehab Cost</div>
+<div class="example-box">📐 A 2,000 sqft duplex:<br>2,000 × $25 = <strong>$50,000</strong> rehab budget</div>
+<div class="tampa-tip">🌴 Tampa Rule: ~$25/sqft. Under that = great deal. Way over = ask why!</div>`
+  },
+  {
+    lesson: 1, lessonTitle: "Rehab Cost Per Square Foot", type: "challenge",
+    front: "You find a 1,500 sqft duplex in Tampa that needs full rehab. How much should you budget?",
+    hint: "Use the $25/sqft Tampa rule",
+    back: `<div class="formula-box">1,500 sqft × $25/sqft = $37,500</div>
+You should budget roughly <strong>$37,500</strong>. If a contractor quotes $30k — great deal. If they quote $55k — dig deeper into why.`
+  },
+  {
+    lesson: 1, lessonTitle: "Rehab Cost Per Square Foot", type: "concept",
+    front: "Why does rehab cost per sqft matter when evaluating a deal quickly?",
+    back: `It lets you do <strong>fast math in your head</strong>. When you find a house that needs work, you need to quickly figure out if it's worth buying. See a 1,500 sqft house? That's roughly $37,500 to fix. No need for a contractor quote just to decide if the deal is interesting.`
+  },
+
+  // ===== LESSON 2: Property Appreciation =====
+  {
+    lesson: 2, lessonTitle: "Property Appreciation", type: "concept",
+    front: "What is property appreciation?",
+    back: `Appreciation means <strong>your house goes up in value over time</strong>. It's like buying a rare trading card for $10, and five years later it's worth $30 — it "appreciated." You make money just by <em>owning</em> the property, on top of any rent you collect.`
+  },
+  {
+    lesson: 2, lessonTitle: "Property Appreciation", type: "concept",
+    front: "How much have Tampa houses appreciated in the last 10 years?",
+    back: `Tampa houses went up in value by <strong>175% to 246%</strong> over the last 10 years. A $200,000 house could now be worth $550,000 to $692,000. That's HUGE growth.
+<div class="tampa-tip">🌴 But remember: past growth doesn't guarantee future growth. The rent still needs to make sense!</div>`
+  },
+  {
+    lesson: 2, lessonTitle: "Property Appreciation", type: "challenge",
+    front: "You bought a duplex for $200,000 ten years ago. Tampa appreciated 175%. What's it worth now?",
+    hint: "Multiply the original price by (1 + growth rate)",
+    back: `<div class="formula-box">$200,000 × (1 + 1.75) = $200,000 × 2.75<br>= $550,000</div>
+Your $200k duplex is now worth about <strong>$550,000</strong>. You made $350,000 just by owning it! (At 246% growth, it'd be worth $692,000.)`
+  },
+
+  // ===== LESSON 3: Cap Rate =====
+  {
+    lesson: 3, lessonTitle: "Cap Rate", type: "concept",
+    front: "What is a Cap Rate (Capitalization Rate)?",
+    back: `Cap Rate tells you <strong>how much money a property earns each year compared to its price</strong> — ignoring the loan. Think of it like "miles per gallon" for properties: it helps you compare deals. A piggy bank that costs $100 and gives you $7/year = 7% cap rate.`
+  },
+  {
+    lesson: 3, lessonTitle: "Cap Rate", type: "formula",
+    front: "How do you calculate Cap Rate?",
+    back: `<div class="formula-box">NOI ÷ Purchase Price = Cap Rate %</div>
+<strong>NOI</strong> = Net Operating Income (rent minus expenses, before the loan).
+<div class="example-box">Duplex costs $300,000. NOI is $21,000/year.<br>$21,000 ÷ $300,000 = <strong>7% Cap Rate</strong><br><br>= 7 cents earned per dollar spent (before loan)</div>`
+  },
+  {
+    lesson: 3, lessonTitle: "Cap Rate", type: "concept",
+    front: "What's the difference between a high and low cap rate?",
+    back: `<strong>Higher Cap Rate (7-10%):</strong> Property earns more for its price. Usually older areas. More income, but more risk.<br><br><strong>Lower Cap Rate (3-5%):</strong> Property earns less for its price. Usually nicer areas. Less income, but safer and the value usually grows more.`
+  },
+  {
+    lesson: 3, lessonTitle: "Cap Rate", type: "challenge",
+    front: "A Tampa duplex costs $350,000 and has an NOI of $24,500/year. What's the cap rate?",
+    hint: "NOI ÷ Price",
+    back: `<div class="formula-box">$24,500 ÷ $350,000 = 0.07 = 7% Cap Rate</div>
+That's a solid <strong>7% cap rate</strong> — right in the sweet spot for Tampa. You earn 7 cents per year for every dollar invested (before the loan).`
+  },
+
+  // ===== LESSON 4: Buy High / Sell Low Cap Rate =====
+  {
+    lesson: 4, lessonTitle: "Buy High / Sell Low Cap Rate", type: "concept",
+    front: "What is the 'Buy High / Sell Low' Cap Rate strategy?",
+    back: `It sounds backwards, but: <strong>a LOWER cap rate means the property is worth MORE money</strong>. The strategy: buy a messy property at a HIGH cap rate (cheap), fix it up, raise the rent, and now it's worth much more at a LOW cap rate. Like buying a messy restaurant cheap, filling the tables, and selling it as a popular spot!`
+  },
+  {
+    lesson: 4, lessonTitle: "Buy High / Sell Low Cap Rate", type: "challenge",
+    front: "A beat-up duplex makes $18,000/year (8% cap). You fix it up and now it makes $27,000/year. Buyers pay 6% cap. What did you buy for vs. sell for?",
+    hint: "Value = NOI ÷ Cap Rate",
+    back: `<div class="formula-box">BUY: $18,000 ÷ 0.08 = $225,000<br><br>SELL: $27,000 ÷ 0.06 = $450,000</div>
+You bought for <strong>$225k</strong>, sell for <strong>$450k</strong>. That's a $225,000 profit! This is how investors build wealth — buy at high cap rate, sell at low cap rate.`
+  },
+
+  // ===== LESSON 5: NOI =====
+  {
+    lesson: 5, lessonTitle: "Net Operating Income (NOI)", type: "concept",
+    front: "What is NOI (Net Operating Income)?",
+    back: `NOI is <strong>how much money the property makes before you pay the loan</strong>. Think of a lemonade stand: you sold $100 of lemonade, spent $40 on supplies. Your leftover is $60 — that's your NOI!<br><br><strong>Important:</strong> NOI does NOT include your mortgage payment. It only looks at what the property earns minus what it costs to run.`
+  },
+  {
+    lesson: 5, lessonTitle: "Net Operating Income (NOI)", type: "formula",
+    front: "How do you calculate NOI?",
+    back: `<div class="formula-box">Total Rent Collected<br>− Operating Expenses (repairs, taxes, insurance...)<br>= NOI (what's left over)</div>
+<div class="example-box">2 units × $1,800/mo × 12 = $43,200/yr income<br>Expenses (40%): $43,200 × 0.40 = $17,280<br><strong>NOI = $43,200 − $17,280 = $25,920/yr</strong></div>
+<div class="tampa-tip">🌴 Tampa Tip: Budget 35-45% of rent for expenses. Florida taxes and insurance are high!</div>`
+  },
+  {
+    lesson: 5, lessonTitle: "Net Operating Income (NOI)", type: "concept",
+    front: "What are operating expenses? Is rent an expense?",
+    back: `Operating expenses are the costs of <strong>running</strong> the property: repairs, property taxes, insurance, management fees, etc.<br><br><strong>Rent is NOT an expense — rent is your income!</strong> The two are completely separate.<br><br>RENT = money coming IN (tenants pay you)<br>EXPENSES = money going OUT (you pay for repairs, taxes, insurance)`
+  },
+  {
+    lesson: 5, lessonTitle: "Net Operating Income (NOI)", type: "concept",
+    front: "What is the 40% shortcut for estimating expenses?",
+    back: `Instead of adding up every bill, investors estimate that expenses will be <strong>about 40% of the rent amount</strong>. This does NOT mean rent is an expense! It means: "if I collect $43,200 in rent, about 40% ($17,280) goes to bills. The other 60% ($25,920) is my NOI."
+<div class="tampa-tip">🌴 It's just a shortcut to estimate bills — the rent itself is always your income!</div>`
+  },
+  {
+    lesson: 5, lessonTitle: "Net Operating Income (NOI)", type: "concept",
+    front: "If you live in one unit (house hacking), does that change the property's NOI?",
+    back: `<strong>No!</strong> The property's NOI stays the same. NOI measures what the property <em>could</em> earn if both units were rented — it's the property's performance as a <strong>business</strong>, not your personal situation.<br><br>NOI = the building's report card.<br>Your housing cost = your personal budget (see House Hacking, Lesson 11).`
+  },
+  {
+    lesson: 5, lessonTitle: "Net Operating Income (NOI)", type: "challenge",
+    front: "A Tampa duplex rents both units at $1,800/month each. Using the 40% expense rule, what's the NOI?",
+    hint: "Total annual rent − 40% for expenses",
+    back: `<div class="formula-box">Income: $1,800 × 2 × 12 = $43,200/yr<br>Expenses: $43,200 × 0.40 = $17,280<br>NOI = $43,200 − $17,280 = $25,920/yr</div>
+The NOI is <strong>$25,920 per year</strong> (or $2,160/month). This is the most important number in real estate investing!`
+  },
+
+  // ===== LESSON 6: NOI / Cap Rate = Property Value =====
+  {
+    lesson: 6, lessonTitle: "NOI / Cap Rate = Property Value", type: "concept",
+    front: "How can you figure out what a property is actually WORTH?",
+    back: `Instead of asking "what's my return?", you ask: <strong>"what is this property WORTH based on how much money it makes?"</strong> It's like saying: "This lemonade stand makes $60/year. Stands here sell for a 10% return. So this stand is worth $600."
+<div class="formula-box">NOI ÷ Cap Rate = Property Value</div>`
+  },
+  {
+    lesson: 6, lessonTitle: "NOI / Cap Rate = Property Value", type: "challenge",
+    front: "Your duplex has an NOI of $25,920. Tampa duplexes in your area sell at a 6.5% cap rate. What's it worth?",
+    hint: "NOI ÷ Cap Rate",
+    back: `<div class="formula-box">$25,920 ÷ 0.065 = $398,769</div>
+Based on its income, the duplex is worth about <strong>$399,000</strong>. If someone asks $350k — it might be a deal. If they want $500k — you'd be overpaying!
+<div class="tampa-tip">🌴 Key insight: if you INCREASE the NOI (raise rent, lower costs), the property value goes UP!</div>`
+  },
+
+  // ===== LESSON 7: GRM =====
+  {
+    lesson: 7, lessonTitle: "Gross Rent Multiplier (GRM)", type: "concept",
+    front: "What is GRM (Gross Rent Multiplier)?",
+    back: `GRM answers one question: <strong>"How many years of rent would it take to pay for this property?"</strong> Think of buying a $20 toy when your allowance is $5/week — it takes 4 weeks to "pay it off." Your GRM is 4.<br><br>Lower GRM (6-10) = better deal (fewer years of rent to pay the price).<br>Higher GRM (12+) = cash flow will be tight.`
+  },
+  {
+    lesson: 7, lessonTitle: "Gross Rent Multiplier (GRM)", type: "formula",
+    front: "How do you calculate GRM?",
+    back: `<div class="formula-box">Property Price ÷ Annual Gross Rent = GRM</div>
+<div class="example-box">Duplex costs $350,000. Both units bring in $43,200/year.<br>$350,000 ÷ $43,200 = <strong>GRM of 8.1</strong><br><br>It would take ~8 years of rent to equal the price. Under 10 = decent!</div>`
+  },
+  {
+    lesson: 7, lessonTitle: "Gross Rent Multiplier (GRM)", type: "challenge",
+    front: "A duplex costs $400,000. Each unit rents for $1,600/month. What's the GRM? Is it a good deal?",
+    hint: "Total annual rent first, then Price ÷ Annual Rent",
+    back: `<div class="formula-box">Annual rent: $1,600 × 2 × 12 = $38,400<br>GRM: $400,000 ÷ $38,400 = 10.4</div>
+GRM is <strong>10.4</strong> — that's on the higher side. Under 10 is decent, so this deal would need closer inspection. Cash flow might be tight.`
+  },
+
+  // ===== LESSON 8: The 1% Rule =====
+  {
+    lesson: 8, lessonTitle: "The 1% Rule", type: "concept",
+    front: "What is the 1% Rule?",
+    back: `The simplest pass/fail test in real estate: <strong>your total monthly rent should be at least 1% of the purchase price</strong>. Buy something for $100? It needs to earn at least $1/month. Simple.
+<div class="formula-box">Purchase Price × 0.01 = Minimum Monthly Rent</div>
+<div class="tampa-tip">🌴 Reality check: In 2026, many Tampa properties DON'T pass because prices went up faster than rents. 0.85% might still work if the area is growing fast.</div>`
+  },
+  {
+    lesson: 8, lessonTitle: "The 1% Rule", type: "challenge",
+    front: "A Tampa duplex costs $350,000. Each unit rents for $1,800/month. Does it pass the 1% Rule?",
+    hint: "Price × 0.01 vs. total monthly rent",
+    back: `<div class="formula-box">$350,000 × 0.01 = $3,500 needed/month<br>Your rent: $1,800 + $1,800 = $3,600/month<br><br>$3,600 > $3,500 → PASSES! ✅</div>
+It passes by $100/month — just barely, but it passes!`
+  },
+
+  // ===== LESSON 9: Mortgage & PITI =====
+  {
+    lesson: 9, lessonTitle: "Mortgage & PITI", type: "concept",
+    front: "What is a mortgage?",
+    back: `A mortgage is a <strong>loan to buy a house</strong>. The bank gives you money now, and you pay them back slowly over 15 or 30 years — with interest (the bank's fee for lending you money). You're basically "renting" money from the bank.`
+  },
+  {
+    lesson: 9, lessonTitle: "Mortgage & PITI", type: "concept",
+    front: "What does PITI stand for and what does it mean?",
+    back: `PITI is the four things in your <strong>total monthly payment</strong>:<br><br><strong>P</strong> = Principal (paying back the loan itself)<br><strong>I</strong> = Interest (the bank's fee)<br><strong>T</strong> = Taxes (property taxes)<br><strong>I</strong> = Insurance<br><br>All four together = your total monthly housing bill.
+<div class="tampa-tip">🌴 Florida Warning: Insurance is among the highest in the country because of hurricanes. Always get real quotes!</div>`
+  },
+  {
+    lesson: 9, lessonTitle: "Mortgage & PITI", type: "formula",
+    front: "How do you calculate a typical PITI payment for a Tampa duplex?",
+    back: `<div class="example-box"><strong>Example: $350,000 duplex, 3.5% down (FHA)</strong><br><br>Down Payment: $350,000 × 0.035 = $12,250<br>Loan Amount: $350,000 − $12,250 = $337,750<br><br>Principal + Interest (~7%, 30yr): ~$2,248/mo<br>Property Taxes: ~$350/mo<br>Insurance: ~$250/mo<br><strong>TOTAL PITI: ~$2,848/month</strong></div>
+<div class="tampa-tip">🌴 You don't need to calculate P+I yourself — any mortgage calculator online does it. Just understand what it means!</div>`
+  },
+
+  // ===== LESSON 10: Cash Flow =====
+  {
+    lesson: 10, lessonTitle: "Cash Flow", type: "concept",
+    front: "What is Cash Flow?",
+    back: `Cash flow is the money that <strong>actually goes into your pocket</strong> every month after paying ALL bills — including the mortgage. Think of your allowance: after lunch and phone bill, whatever's left is your cash flow.
+<div class="formula-box">NOI − Mortgage (PITI) = Cash Flow</div>
+<div class="tampa-tip">🎯 Target: at least $100-$200 per unit per month in positive cash flow. For a duplex = $200-$400/month total.</div>`
+  },
+  {
+    lesson: 10, lessonTitle: "Cash Flow", type: "challenge",
+    front: "Your duplex has an NOI of $25,920/year. Your mortgage (PITI) is $2,848/month. What's your monthly cash flow?",
+    hint: "Monthly NOI − Monthly PITI",
+    back: `<div class="formula-box">Monthly NOI: $25,920 ÷ 12 = $2,160/mo<br>Mortgage (PITI): $2,848/mo<br><br>$2,160 − $2,848 = −$688/month ❌</div>
+That's <strong>NEGATIVE</strong> — you'd be losing $688/month! This is why running the numbers is so important. You'd need a lower price, higher rents, or a different property.`
+  },
+
+  // ===== LESSON 11: House Hacking =====
+  {
+    lesson: 11, lessonTitle: "House Hacking (Year 1)", type: "concept",
+    front: "What is House Hacking?",
+    back: `House hacking means <strong>you live in one side of your duplex and rent out the other side</strong>. Your tenant's rent pays part (or all!) of your mortgage. The big bonus? You can use an <strong>FHA loan with only 3.5% down</strong> (instead of 20-25%). You just have to live there for one year.
+<div class="tampa-tip">🎯 Year 1 Goal: The goal isn't to make profit — it's to slash your housing costs dramatically.</div>`
+  },
+  {
+    lesson: 11, lessonTitle: "House Hacking (Year 1)", type: "formula",
+    front: "How do you calculate your cost when house hacking?",
+    back: `<div class="formula-box">PITI − Tenant's Rent = YOUR monthly cost</div>
+<div class="example-box">Your mortgage (PITI): $2,848/mo<br>Rent from other unit: $1,800/mo<br><strong>YOUR cost: $2,848 − $1,800 = $1,048/mo</strong><br><br>Average Tampa apartment: $1,768/mo<br>Savings: $1,768 − $1,048 = <strong>$720/mo saved!</strong></div>
+You save $720/month AND you're building ownership. After Year 1, move out, rent both sides, buy another duplex!`
+  },
+
+  // ===== LESSON 12: Investor Calculation (Year 2+) =====
+  {
+    lesson: 12, lessonTitle: "Investor Calculation (Year 2+)", type: "concept",
+    front: "What changes after Year 1 (when you move out)?",
+    back: `After you move out, both units are rented. Now you treat this as a <strong>pure business</strong>. The property needs to make money on its own. You calculate the \"real\" NOI using vacancy loss, and check if cash flow is positive. <strong>The math has to work BEFORE you buy!</strong>`
+  },
+  {
+    lesson: 12, lessonTitle: "Investor Calculation (Year 2+)", type: "challenge",
+    front: "Both units rent for $1,800/month. Vacancy 10.5%, expenses 40%, annual mortgage $34,176. What's the yearly cash flow?",
+    hint: "Gross rent → subtract vacancy → subtract expenses = NOI → subtract mortgage",
+    back: `<div class="formula-box">Gross Rent: $1,800 × 2 × 12 = $43,200<br>Vacancy (10.5%): −$4,536<br>Effective Income: $38,664<br>Expenses (40%): −$15,466<br>NOI = $23,198/yr<br><br>Cash Flow: $23,198 − $34,176 = −$10,978/yr ❌</div>
+<strong>Negative cash flow.</strong> You'd need a lower price, higher rents, or a different property.
+<div class="tampa-tip">🌴 Tampa has a high vacancy rate of 10.3-11.4% right now — always budget for this!</div>`
+  },
+
+  // ===== LESSON 13: Cash-on-Cash Return =====
+  {
+    lesson: 13, lessonTitle: "Cash-on-Cash Return (CoC)", type: "concept",
+    front: "What is Cash-on-Cash Return?",
+    back: `Cash-on-Cash answers: <strong>"For every dollar I put IN, how many cents do I get BACK each year?"</strong> It only looks at YOUR money — not the bank's. Imagine you put $5 into a vending machine business and get $0.50 profit/year. Your return is 10%.
+<div class="tampa-tip">🎯 Tampa Target: Aim for 8% to 12%. Below 8% might not be worth the effort. Above 12% is excellent!</div>`
+  },
+  {
+    lesson: 13, lessonTitle: "Cash-on-Cash Return (CoC)", type: "formula",
+    front: "How do you calculate Cash-on-Cash Return?",
+    back: `<div class="formula-box">(Annual Cash Flow ÷ Total Cash Invested) × 100<br>= CoC Return %</div>
+<div class="example-box">Annual cash flow: $3,600 ($300/month)<br>Your money in:<br>  Down payment (3.5%): $12,250<br>  Closing costs (3%): $10,500<br>  Total: $22,750<br><br>$3,600 ÷ $22,750 × 100 = <strong>15.8% CoC Return!</strong></div>
+For every dollar you invested, you get 15.8 cents back per year. Way better than a savings account!`
+  },
+  {
+    lesson: 13, lessonTitle: "Cash-on-Cash Return (CoC)", type: "concept",
+    front: "What are closing costs?",
+    back: `Closing costs are <strong>service fees for buying a house</strong> — like those extra fees when you buy concert tickets online. They're charged by the bank (loan processing), the appraiser (property valuation), the title company (ownership check), the lawyer (paperwork), and the government (recording the sale).
+<div class="formula-box">Rule of thumb: ~3% of purchase price<br>$350,000 × 0.03 = $10,500</div>
+In real life they range from 2% to 5%. Your lender gives you the exact number before you buy.`
+  },
+
+  // ===== LESSON 14: DSCR =====
+  {
+    lesson: 14, lessonTitle: "Debt Service Coverage Ratio (DSCR)", type: "concept",
+    front: "What is DSCR (Debt Service Coverage Ratio)?",
+    back: `DSCR is your <strong>safety net check</strong>. It asks: "Does this property make enough money to comfortably pay the mortgage?" Think of your allowance ($20/week) vs. phone bill ($15/week): your ratio is 20÷15 = 1.33. You have 33% breathing room!
+<div class="example-box">Below 1.0 = BAD (can't cover mortgage)<br>1.0-1.19 = Risky<br>1.20+ = GOOD<br>1.40+ = GREAT!</div>`
+  },
+  {
+    lesson: 14, lessonTitle: "Debt Service Coverage Ratio (DSCR)", type: "formula",
+    front: "How do you calculate DSCR?",
+    back: `<div class="formula-box">NOI ÷ Annual Mortgage Payment = DSCR</div>
+<div class="example-box"><strong>Bad DSCR:</strong> $23,198 ÷ $34,176 = 0.68 ❌<br>DANGER! The property doesn't even cover the mortgage.<br><br><strong>Good DSCR:</strong> $30,000 ÷ $24,000 = 1.25 ✅<br>The property earns 25% MORE than the mortgage costs.</div>
+<div class="tampa-tip">🎯 Always aim for 1.20 or higher. This is your "sleep at night" number!</div>`
+  },
+
+  // ===== LESSON 15: Vacancy Rate =====
+  {
+    lesson: 15, lessonTitle: "Vacancy Rate", type: "concept",
+    front: "What is Vacancy Rate?",
+    back: `Vacancy rate is the <strong>percentage of time your property sits EMPTY</strong> with no tenant paying rent. Even great properties have some vacancy — tenants move out and it takes time to find new ones. In a duplex, if ONE unit goes empty, you just lost <strong>50% of your income</strong>!
+<div class="tampa-tip">🌴 Tampa 2026: Vacancy rate is 10.3% to 11.4% because LOTS of new apartments were built. Budget at least 10.5%!</div>`
+  },
+  {
+    lesson: 15, lessonTitle: "Vacancy Rate", type: "challenge",
+    front: "Your Tampa duplex grosses $43,200/year in rent. Using 10.5% vacancy, how much income do you actually lose?",
+    hint: "Annual rent × vacancy rate",
+    back: `<div class="formula-box">$43,200 × 0.105 = $4,536/year lost<br>That's $378 lost EVERY month!</div>
+You lose <strong>$4,536/year</strong> to vacancy. This is why smart investors always subtract vacancy BEFORE calculating NOI. Never assume 100% occupancy!`
+  },
+
+  // ===== LESSON 16: Action Checklist =====
+  {
+    lesson: 16, lessonTitle: "Tampa Action Checklist", type: "concept",
+    front: "What are the 4 steps to evaluate a Tampa duplex deal?",
+    back: `<strong>Step 1 — Quick Filters (30 sec):</strong> Does it pass the 1% Rule? Is the GRM under 10-12?<br><br><strong>Step 2 — Deep Dive (30 min):</strong> Calculate NOI, Cap Rate, and estimate rehab costs.<br><br><strong>Step 3 — Money Test (1 hr):</strong> House Hack math (Year 1) and Investor math (Year 2+). Calculate Cash-on-Cash Return.<br><br><strong>Step 4 — Safety Check:</strong> Calculate DSCR. Must be 1.20 or higher!`
+  },
+  {
+    lesson: 16, lessonTitle: "Tampa Action Checklist", type: "concept",
+    front: "What are the key Tampa-specific things to always remember?",
+    back: `<strong>1.</strong> Check Hillsborough County property taxes — they're big!<br><br><strong>2.</strong> Get REAL insurance quotes — hurricanes make Florida insurance very expensive.<br><br><strong>3.</strong> Monitor the vacancy rate (currently ~10.7%) — lots of new apartments mean more competition.<br><br><strong>4.</strong> Look into FHA loans (3.5% down) if you'll live in one unit.<br><br><strong>5.</strong> Average Tampa apartment rent: ~$1,768/month (your house hack comparison).`
+  },
+
+  // ===== BONUS: Formula Cheat Sheet Cards =====
+  {
+    lesson: 0, lessonTitle: "Formula Cheat Sheet", type: "formula",
+    front: "Quick: What are ALL the key formulas in one place?",
+    back: `<div class="formula-box" style="font-size:0.82rem; line-height:1.7;">
+Rehab Cost = Sqft × $25<br>
+NOI = Rent − Expenses<br>
+Cap Rate = NOI ÷ Price<br>
+Property Value = NOI ÷ Cap Rate<br>
+GRM = Price ÷ Annual Rent<br>
+1% Rule = Price × 0.01 (min monthly rent)<br>
+Cash Flow = NOI − Mortgage<br>
+House Hack = PITI − Tenant Rent<br>
+CoC Return = Cash Flow ÷ Cash Invested<br>
+DSCR = NOI ÷ Annual Mortgage</div>`
+  }
+];
+
+// ==========================================
+// APP STATE & STORAGE
+// ==========================================
+const EMOJIS = ['😎','🏠','💰','🌴','🔑','📊','🎯','🦩','☀️','🧠','👩‍💼','👨‍💼','🐊','🏖️','💪','🌟'];
+const STORAGE_KEY = 'tampa_flashcards_v2';
+
+let state = { users: [], currentUser: null };
+let gameState = { cards: [], index: 0, flipped: false, results: { good:0, hard:0, again:0 } };
+let deleteTarget = null;
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch(e) {}
+  if (!state.users) state.users = [];
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function getUserProgress() {
+  const u = state.users.find(u => u.id === state.currentUser);
+  return u ? u.progress : {};
+}
+function setCardProgress(cardKey, rating) {
+  const u = state.users.find(u => u.id === state.currentUser);
+  if (!u) return;
+  if (!u.progress) u.progress = {};
+  u.progress[cardKey] = { rating, date: Date.now() };
+  saveState();
+}
+function cardKey(card) {
+  return `L${card.lesson}_${card.type}_${card.front.substring(0,30)}`;
+}
+
+// ==========================================
+// SCREENS
+// ==========================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+}
+
+// ==========================================
+// USER MANAGEMENT
+// ==========================================
+function renderUserScreen() {
+  const container = document.getElementById('userCards');
+  container.innerHTML = '';
+  state.users.forEach(u => {
+    const div = document.createElement('div');
+    div.className = 'user-card';
+    div.onclick = () => selectUser(u.id);
+    div.innerHTML = `<div class="avatar">${u.avatar}</div><div class="uname">${u.name}</div>`;
+    container.appendChild(div);
+  });
+}
+
+let selectedEmoji = '😎';
+function openAddUser() {
+  document.getElementById('addUserModal').classList.add('show');
+  document.getElementById('newUserName').value = '';
+  selectedEmoji = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+  renderEmojiPicker();
+  setTimeout(() => document.getElementById('newUserName').focus(), 100);
+}
+function closeAddUser() { document.getElementById('addUserModal').classList.remove('show'); }
+function renderEmojiPicker() {
+  const container = document.getElementById('emojiPick');
+  container.innerHTML = '';
+  EMOJIS.forEach(e => {
+    const btn = document.createElement('button');
+    btn.textContent = e;
+    btn.className = e === selectedEmoji ? 'selected' : '';
+    btn.onclick = () => { selectedEmoji = e; renderEmojiPicker(); };
+    container.appendChild(btn);
+  });
+}
+function confirmAddUser() {
+  const name = document.getElementById('newUserName').value.trim();
+  if (!name) return;
+  const user = { id: Date.now().toString(), name, avatar: selectedEmoji, progress: {} };
+  state.users.push(user);
+  saveState();
+  closeAddUser();
+  renderUserScreen();
+}
+function selectUser(id) {
+  state.currentUser = id;
+  saveState();
+  showScreen('dashboard');
+}
+function switchUser() {
+  state.currentUser = null;
+  saveState();
+  showScreen('userScreen');
+  renderUserScreen();
+}
+function openDeleteModal() {
+  deleteTarget = state.currentUser;
+  document.getElementById('deleteModal').classList.add('show');
+}
+function closeDeleteModal() {
+  deleteTarget = null;
+  document.getElementById('deleteModal').classList.remove('show');
+}
+function confirmDelete() {
+  if (deleteTarget) {
+    state.users = state.users.filter(u => u.id !== deleteTarget);
+    state.currentUser = null;
+    saveState();
+    closeDeleteModal();
+    showScreen('userScreen');
+    renderUserScreen();
+  }
+}
+
+// ==========================================
+// DASHBOARD
+// ==========================================
+function renderDashboard() {
+  const u = state.users.find(u => u.id === state.currentUser);
+  if (!u) return switchUser();
+  document.getElementById('dashAvatar').textContent = u.avatar;
+  document.getElementById('dashGreeting').textContent = `Hey, ${u.name}!`;
+
+  const progress = u.progress || {};
+  const total = ALL_CARDS.length;
+  const mastered = Object.values(progress).filter(p => p.rating === 'good').length;
+  const pct = total > 0 ? Math.round((mastered/total)*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('masteredCount').textContent = mastered + ' mastered';
+  document.getElementById('totalCards').textContent = total + ' cards total';
+
+  // Lesson grid
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = '';
+  const lessons = [
+    {n:1,t:"Rehab Cost/sqft"},{n:2,t:"Appreciation"},{n:3,t:"Cap Rate"},
+    {n:4,t:"Buy High/Sell Low"},{n:5,t:"NOI"},{n:6,t:"NOI → Value"},
+    {n:7,t:"GRM"},{n:8,t:"1% Rule"},{n:9,t:"Mortgage & PITI"},
+    {n:10,t:"Cash Flow"},{n:11,t:"House Hacking"},{n:12,t:"Investor Calc"},
+    {n:13,t:"Cash-on-Cash"},{n:14,t:"DSCR"},{n:15,t:"Vacancy Rate"},
+    {n:16,t:"Action Checklist"}
+  ];
+  lessons.forEach(l => {
+    const lessonCards = ALL_CARDS.filter(c => c.lesson === l.n);
+    const statuses = lessonCards.map(c => {
+      const p = progress[cardKey(c)];
+      return p ? p.rating : 'new';
+    });
+    let dotClass = 'new';
+    if (statuses.every(s => s === 'good')) dotClass = 'mastered';
+    else if (statuses.some(s => s === 'good' || s === 'hard')) dotClass = 'learning';
+
+    const btn = document.createElement('div');
+    btn.className = 'lesson-btn';
+    btn.onclick = () => startGame('lesson', l.n);
+    btn.innerHTML = `<div class="lnum">LESSON ${l.n}</div><div class="ltitle">${l.t}</div><div class="ldot ${dotClass}"></div>`;
+    grid.appendChild(btn);
+  });
+}
+
+// ==========================================
+// GAME
+// ==========================================
+function startGame(mode, lessonNum) {
+  let cards = [];
+  const progress = getUserProgress();
+
+  if (mode === 'all') {
+    cards = [...ALL_CARDS];
+    shuffleArray(cards);
+    document.getElementById('gameTitle').textContent = 'All Cards (Shuffle)';
+  } else if (mode === 'weak') {
+    cards = ALL_CARDS.filter(c => {
+      const p = progress[cardKey(c)];
+      return !p || p.rating === 'again' || p.rating === 'hard';
+    });
+    shuffleArray(cards);
+    document.getElementById('gameTitle').textContent = 'Weak Cards';
+    if (cards.length === 0) {
+      alert("No weak cards! You've mastered everything — try All Cards to review.");
+      return;
+    }
+  } else if (mode === 'formulas') {
+    cards = ALL_CARDS.filter(c => c.type === 'formula' || c.type === 'challenge');
+    shuffleArray(cards);
+    document.getElementById('gameTitle').textContent = 'Formulas & Calculations';
+  } else if (mode === 'lesson') {
+    cards = ALL_CARDS.filter(c => c.lesson === lessonNum);
+    const info = cards[0];
+    document.getElementById('gameTitle').textContent = info ? `L${lessonNum}: ${info.lessonTitle}` : `Lesson ${lessonNum}`;
+  }
+
+  gameState = { cards, index: 0, flipped: false, results: { good:0, hard:0, again:0 } };
+  showScreen('gameScreen');
+  renderCard();
+}
+
+function renderCard() {
+  if (gameState.index >= gameState.cards.length) return showResults();
+  const card = gameState.cards[gameState.index];
+  const fc = document.getElementById('flashcard');
+  fc.classList.remove('flipped');
+  gameState.flipped = false;
+
+  document.getElementById('gameCount').textContent = `${gameState.index+1} / ${gameState.cards.length}`;
+
+  const typeBadge = card.type === 'concept' ? '<span class="card-type-badge badge-concept">Concept</span>' :
+                    card.type === 'formula' ? '<span class="card-type-badge badge-formula">Formula</span>' :
+                    '<span class="card-type-badge badge-challenge">Challenge</span>';
+
+  document.getElementById('cardFront').innerHTML = `
+    ${typeBadge}
+    <div class="card-question">${card.front}</div>
+    ${card.hint ? `<div class="card-hint">💡 Hint: ${card.hint}</div>` : ''}
+    <div class="card-lesson-ref">Lesson ${card.lesson}${card.lesson === 0 ? '' : ': ' + card.lessonTitle}</div>
+  `;
+  document.getElementById('cardBack').innerHTML = `
+    ${typeBadge}
+    <div class="card-answer">${card.back}</div>
+  `;
+
+  document.getElementById('tapHint').style.display = 'block';
+  document.getElementById('cardActions').style.display = 'none';
+}
+
+function flipCard() {
+  const fc = document.getElementById('flashcard');
+  if (!gameState.flipped) {
+    fc.classList.add('flipped');
+    gameState.flipped = true;
+    document.getElementById('tapHint').style.display = 'none';
+    document.getElementById('cardActions').style.display = 'flex';
+  }
+}
+
+function rateCard(rating) {
+  const card = gameState.cards[gameState.index];
+  setCardProgress(cardKey(card), rating);
+  gameState.results[rating]++;
+  gameState.index++;
+  renderCard();
+}
+
+function showResults() {
+  const r = gameState.results;
+  const total = r.good + r.hard + r.again;
+  const pct = total > 0 ? Math.round((r.good/total)*100) : 0;
+
+  let emoji = '🎉', title = 'Amazing work!';
+  if (pct < 40) { emoji = '💪'; title = 'Keep practicing!'; }
+  else if (pct < 70) { emoji = '📈'; title = 'Getting there!'; }
+  else if (pct < 90) { emoji = '🔥'; title = 'Great session!'; }
+
+  document.getElementById('resultsEmoji').textContent = emoji;
+  document.getElementById('resultsTitle').textContent = title;
+  document.getElementById('resGood').textContent = r.good;
+  document.getElementById('resHard').textContent = r.hard;
+  document.getElementById('resAgain').textContent = r.again;
+
+  showScreen('resultsScreen');
+}
+
+function exitGame() { showScreen('dashboard'); }
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// ==========================================
+// INIT
+// ==========================================
+loadState();
+renderUserScreen();
+if (state.currentUser && state.users.find(u => u.id === state.currentUser)) {
+  showScreen('dashboard');
+} else {
+  showScreen('userScreen');
+}
+</script>
+</body>
+</html>
