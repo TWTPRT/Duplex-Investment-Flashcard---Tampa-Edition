@@ -899,21 +899,24 @@ function renderDashboard() {
 // ==========================================
 // GAME
 // ==========================================
+const SESSION_SIZE = 10;
+
 function startGame(mode, lessonNum) {
   let cards = [];
   const progress = getUserProgress();
+  let title = '';
 
   if (mode === 'all') {
     cards = [...ALL_CARDS];
     shuffleArray(cards);
-    document.getElementById('gameTitle').textContent = 'All Cards (Shuffle)';
+    title = 'All Cards (Shuffle)';
   } else if (mode === 'weak') {
     cards = ALL_CARDS.filter(c => {
       const p = progress[cardKey(c)];
       return !p || p.rating === 'again' || p.rating === 'hard';
     });
     shuffleArray(cards);
-    document.getElementById('gameTitle').textContent = 'Weak Cards';
+    title = 'Weak Cards';
     if (cards.length === 0) {
       alert("No weak cards! You've mastered everything — try All Cards to review.");
       return;
@@ -921,13 +924,21 @@ function startGame(mode, lessonNum) {
   } else if (mode === 'formulas') {
     cards = ALL_CARDS.filter(c => c.type === 'formula' || c.type === 'challenge');
     shuffleArray(cards);
-    document.getElementById('gameTitle').textContent = 'Formulas & Calculations';
+    title = 'Formulas & Calculations';
   } else if (mode === 'lesson') {
     cards = ALL_CARDS.filter(c => c.lesson === lessonNum);
     const info = cards[0];
-    document.getElementById('gameTitle').textContent = info ? `L${lessonNum}: ${info.lessonTitle}` : `Lesson ${lessonNum}`;
+    title = info ? `L${lessonNum}: ${info.lessonTitle}` : `Lesson ${lessonNum}`;
   }
 
+  // Cap session at SESSION_SIZE cards (except single-lesson mode which is usually small)
+  if (mode !== 'lesson' && cards.length > SESSION_SIZE) {
+    const totalAvailable = cards.length;
+    cards = cards.slice(0, SESSION_SIZE);
+    title += ` (${SESSION_SIZE} of ${totalAvailable})`;
+  }
+
+  document.getElementById('gameTitle').textContent = title;
   gameState = { cards, index: 0, flipped: false, results: { good:0, hard:0, again:0 } };
   showScreen('gameScreen');
   renderCard();
